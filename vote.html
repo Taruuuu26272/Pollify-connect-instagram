@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vote | Beauty Ambassador 2025</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #ffe6f0, #ffffff);
+      font-family: 'Open Sans', sans-serif;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .header {
+      text-align: center;
+      padding: 40px 20px 10px;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #b30059;
+    }
+
+    .header p {
+      font-size: 1rem;
+      color: #666;
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 1.1rem;
+      margin-top: 10px;
+      color: #b30059;
+    }
+
+    .contestants {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding: 30px 10px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 25px 15px;
+      width: 90vw;
+      max-width: 260px;
+      text-align: center;
+      transition: transform 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 5px solid #ffd1e1;
+      margin-bottom: 12px;
+    }
+
+    .card h3 {
+      margin: 10px 0 8px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #b30059;
+    }
+
+    .vote-btn {
+      background: #b30059;
+      color: #fff;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .vote-btn:hover:not(:disabled) {
+      background: #800040;
+    }
+
+    .vote-btn:disabled {
+      background: #ccc !important;
+      cursor: not-allowed !important;
+      opacity: 0.7;
+    }
+
+    .vote-count {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #444;
+      font-size: 0.95rem;
+    }
+
+    .confirmation {
+      text-align: center;
+      font-size: 1rem;
+      color: green;
+      margin-top: 10px;
+      min-height: 24px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 15px 10px;
+      font-size: 0.85rem;
+      color: #888;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+    }
+
+    @media (min-width: 600px) {
+      .contestants {
+        gap: 40px;
+      }
+      .card {
+        width: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Vote for Our Beauty Ambassador 2025</h1>
+    <p>Your voice matters. One vote per person. Make it count!</p>
+    <div class="timer" id="countdown"></div>
+  </div>
+
+  <div class="contestants">
+    <div class="card">
+      <img src="img/aarohi.png" alt="Contestant 1" />
+      <h3>Aarohi Sharma</h3>
+      <button class="vote-btn" onclick="confirmVote(1)">Vote</button>
+      <div class="vote-count" id="votes1">Votes: 0</div>
+    </div>
+    <div class="card">
+      <img src="img/meher.png" alt="Contestant 2" />
+      <h3>Meher Kapoor</h3>
+      <button class="vote-btn" onclick="confirmVote(2)">Vote</button>
+      <div class="vote-count" id="votes2">Votes: 0</div>
+    </div>
+    <div class="card">
+      <img src="img/sanika.png" alt="Contestant 3" />
+      <h3>Sanika Verma</h3>
+      <button class="vote-btn" onclick="confirmVote(3)">Vote</button>
+      <div class="vote-count" id="votes3">Votes: 0</div>
+    </div>
+  </div>
+
+  <div class="confirmation" id="confirmation"></div>
+
+  <div class="footer">
+    © 2025 Beauty Ambassadors India. All rights reserved.
+  </div>
+
+  <script>
+    function disableVoting() {
+      document.querySelectorAll('.vote-btn').forEach(btn => {
+        btn.disabled = true;
+        btn.innerText = 'Already Voted';
+        btn.style.backgroundColor = '#ccc';
+        btn.style.cursor = 'not-allowed';
+      });
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem('hasVoted')) {
+        disableVoting();
+        document.getElementById('confirmation').innerText = 'You have already voted.';
+      }
+    };
+
+    function confirmVote(index) {
+      if (localStorage.getItem('hasVoted')) return;
+      const contestantName = document.querySelectorAll('.card h3')[index - 1].innerText;
+      const confirmAction = confirm(`Are you sure you want to vote for ${contestantName}?`);
+      if (confirmAction) {
+        vote(index);
+      }
+    }
+
+    function vote(index) {
+      localStorage.setItem('hasVoted', 'true');
+      disableVoting();
+
+      const voteBtn = document.querySelectorAll('.vote-btn')[index - 1];
+      voteBtn.innerText = 'Voted!';
+      voteBtn.style.backgroundColor = '#28a745';
+      voteBtn.disabled = true;
+
+      document.getElementById('confirmation').innerText = 'Thank you for voting! Your vote has been recorded.';
+    }
+
+    const countDownDate = new Date("June 15, 2025 23:59:59").getTime();
+    const countdownEl = document.getElementById("countdown");
+
+    setInterval(() => {
+      const now = new Date().getTime();
+      const distance = countDownDate - now;
+
+      if (distance < 0) {
+        countdownEl.innerText = "Voting has ended.";
+        disableVoting();
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownEl.innerText = `Voting ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }, 1000);
+  </script>
+</body>
+</html>
